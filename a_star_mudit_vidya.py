@@ -7,13 +7,6 @@ import time
 open_list = []
 path_list = []
 
-# Reading the start and goal position from the user
-# x = int(input("Please enter start x position: "))
-# y = int(input("Please enter start y position: "))
-# x_i = np.array([y,x])
-# x = int(input("Please enter goal x position: "))
-# y = int(input("Please enter goal y position: "))
-# x_g = np.array([y,x])
 
 # Start recording the time to check time of execution
 start = time.time()
@@ -43,12 +36,6 @@ x_max = 600
 
 y_min = 0
 y_max = 250
-
-# Checking if start node and goal node are in image space
-if x_i[1] < x_min or x_i[1] > x_max or x_i[0] < y_min or x_i[0] > y_max or x_g[1] < x_min or x_g[1] > x_max or x_g[0] < y_min or x_g[0] > y_max:
-	print("Out of bound position. Not valid!")
-	print("Exiting program")
-	exit()
 
 # Creating video codecs with XVID format writer to write 2 videos 
 video_writer_fourcc = cv2.VideoWriter_fourcc(*'XVID') 
@@ -208,17 +195,7 @@ node_arr[:, :, 2] = False		# In closed list
 node_arr[:, :, 3] = False		# In open list
 node_arr[:, :, 4] = np.inf		# Cost to go from current location
 
-# Creating the start and goal nodes. Initializing the start node's cost-to-come as 0
-start_node = node(x_i)
-start_node.ctc = 0
-goal_node = node(x_g)
 
-# Setting start node's cost-to-come in node array as 0 and also, the node at the starting position as the start node
-x_idx = int(x_i[0]*2)
-y_idx = int(x_i[1]*2)
-th_idx = int((x_i[2]%360)/30)
-node_arr[x_idx, y_idx, 1] = 0
-node_arr[x_idx, y_idx, 0] = start_node
 
 # Initializing the blank canvas using numpy ones function
 img = np.ones([250, 600, 3])*255
@@ -256,6 +233,44 @@ img[:, -clearance:] = cv2.bitwise_and(img[:, -clearance:], np.array([255, 0, 0])
 img[0:clearance+1, :] = cv2.bitwise_and(img[0:clearance+1, :], np.array([255, 0, 0]) )
 img[-clearance:, :] = cv2.bitwise_and(img[-clearance:, :], np.array([255, 0, 0]) )
 img = img.astype(np.uint8)
+
+
+
+# Reading the start and goal position from the user
+x = int(input("Please enter start x position: "))
+y = int(input("Please enter start y position: "))
+th = int(input("Please enter start Orientation: "))
+x_i = np.array([y,x,th])
+x = int(input("Please enter goal x position: "))
+y = int(input("Please enter goal y position: "))
+th = int(input("Please enter goal Orientation: "))
+x_g = np.array([y,x,th])
+
+# Checking if start node and goal node are in image space
+while (x_i[1] < x_min or x_i[1] > x_max) or (x_i[0] < y_min or x_i[0] > y_max) or (x_g[1] < x_min or x_g[1] > x_max) or (x_g[0] < y_min or x_g[0] > y_max) or (is_robot_coll(robot_r, int(x_i[1]), int(x_i[0]), map_img=img)) or (is_robot_coll(robot_r, int(x_g[1]), int(x_g[0]), map_img=img)):
+	print("Out of bound position. Not valid! Please re-enter")
+	x = int(input("Please enter start x position: "))
+	y = int(input("Please enter start y position: "))
+	th = int(input("Please enter start Orientation: "))
+	x_i = np.array([y,x,th])
+	x = int(input("Please enter goal x position: "))
+	y = int(input("Please enter goal y position: "))
+	th = int(input("Please enter goal Orientation: "))
+	x_g = np.array([y,x,th])
+
+
+# Creating the start and goal nodes. Initializing the start node's cost-to-come as 0
+start_node = node(x_i)
+start_node.ctc = 0
+goal_node = node(x_g)
+
+# Setting start node's cost-to-come in node array as 0 and also, the node at the starting position as the start node
+x_idx = int(x_i[0]*2)
+y_idx = int(x_i[1]*2)
+th_idx = int((x_i[2]%360)/30)
+node_arr[x_idx, y_idx, 1] = 0
+node_arr[x_idx, y_idx, 0] = start_node
+
 
 # Checking if start node and goal node are in valid locations
 if is_robot_coll(robot_r, x_i[0], x_i[1], map_img=img):
