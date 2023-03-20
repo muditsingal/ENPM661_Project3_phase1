@@ -4,9 +4,11 @@ Github repo for the codes, documentation, and results for ENPM661: Planning for 
 ## Github link:
 https://github.com/muditsingal/ENPM661_Project3_phase1
 
-### General note:
-I have used a hash map to store the node and their parameters as per the pixels in the canvas. This reduces the time required to check if an element is in open list from O(n) to O(1), which improves performance by upto 20 times. The data structure used in an 3D array where the first 2 dimensions represent the y and x coordinates of the image pixel locations, and the 3rd dimension represents the parameters of each node element, such as ctc, is_opened, is_closed and the node object itself.
-
 ### Libraries:
 OpenCV, Numpy, time
 
+### Instructions to run:
+1. Run the python code: a_star_mudit_vidya.py using the IDE that supports user input or using a terminal with python 3 (preferably python 3.8.10).
+2. Enter the input - starting and goal coordinates and orientation of the robot. The program will prompt the user to enter valid values until valid values are entered.
+3. The code will generate 2 videos and also display the map with the ideal path found by A* algorithm.
+4. Observe the output and exit out of the code by pressing any key on keyboard with the map window selected.
