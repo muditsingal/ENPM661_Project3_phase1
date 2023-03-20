@@ -17,7 +17,11 @@ path_list = []
 
 
 # Start recording the time to check time of execution
-clearance = 4
+clearance = int(input("Please enter the clearance required: "))
+while clearance < 0:
+	print("Invalid clearance, please re-enter")
+	clearance = int(input("Please enter the clearance required: "))
+
 robot_r = 4
 vec_len = 2
 
@@ -256,19 +260,22 @@ x_i = np.array([y,x,th])
 x = int(input("Please enter goal x position: "))
 y = int(input("Please enter goal y position: "))
 th = int(input("Please enter goal Orientation: "))
-x_g = np.array([y,x,th])
+x_g = np.array([y,x,np.deg2rad(th)])
+robot_r = int(input("Please robot radius: "))
+x_g = np.array([y,x,np.deg2rad(th)])
 
 # Checking if start node and goal node are in image space
-while (x_i[1] < x_min or x_i[1] > x_max) or (x_i[0] < y_min or x_i[0] > y_max) or (x_g[1] < x_min or x_g[1] > x_max) or (x_g[0] < y_min or x_g[0] > y_max) or (is_robot_coll(robot_r, int(x_i[1]), int(x_i[0]), map_img=img)) or (is_robot_coll(robot_r, int(x_g[1]), int(x_g[0]), map_img=img)):
+while (x_i[1] < x_min or x_i[1] > x_max) or (x_i[0] < y_min or x_i[0] > y_max) or (x_g[1] < x_min or x_g[1] > x_max) or (x_g[0] < y_min or x_g[0] > y_max) or (is_robot_coll(robot_r, int(x_i[1]), int(x_i[0]), map_img=img)) or (is_robot_coll(robot_r, int(x_g[1]), int(x_g[0]), map_img=img)) or (robot_r < 0):
 	print("Out of bound position. Not valid! Please re-enter")
 	x = int(input("Please enter start x position: "))
 	y = int(input("Please enter start y position: "))
 	th = int(input("Please enter start Orientation: "))
-	x_i = np.array([y,x,th])
+	x_i = np.array([y,x,np.deg2rad(th)])
 	x = int(input("Please enter goal x position: "))
 	y = int(input("Please enter goal y position: "))
 	th = int(input("Please enter goal Orientation: "))
-	x_g = np.array([y,x,th])
+	robot_r = int(input("Please robot radius: "))
+	x_g = np.array([y,x,np.deg2rad(th)])
 
 
 # Creating the start and goal nodes. Initializing the start node's cost-to-come as 0
@@ -373,7 +380,6 @@ while back_parent != None:
 # Reverse the path list to get a sorted list from start-node to end-node
 path_list = path_list[::-1]	
 img = img.astype(np.uint8)
-print(path_list)
 
 # Draw the path as black pixels on the image canvas
 for i in range(len(path_list)):
