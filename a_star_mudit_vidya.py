@@ -1,3 +1,11 @@
+'''
+ENPM661: Planning for autonomous robots
+Project 3 Phase 1 submission
+Team Members: 
+Mudit Singal  (119262689) (msingal)
+Vidya Shankar (119376706) (shankar3)
+'''
+
 # Importing all the necessary libraries
 import cv2
 import numpy as np
@@ -9,17 +17,9 @@ path_list = []
 
 
 # Start recording the time to check time of execution
-start = time.time()
 clearance = 4
 robot_r = 4
 vec_len = 2
-
-# Test Start and goal position
-x_i = np.array([15,16, 0])
-# x_g = np.array([35, 582, 0])
-x_g = np.array([34, 35, 0])
-# x_g = np.array([157, 56, 0])
-# x_g = np.array([235, 580])
 
 # Flag to enable start and goal position visualization
 visualize_start_n_goal = True
@@ -44,7 +44,7 @@ video_writer_fourcc2 = cv2.VideoWriter_fourcc(*'XVID')
 
 # Creating 2 video writers, one for path animation and the second for storing the explored nodes
 video = cv2.VideoWriter('path_animation.avi', video_writer_fourcc, 30, (600, 250))
-explore_video = cv2.VideoWriter('explore_animation.avi', video_writer_fourcc2, 60, (600, 250))
+explore_video = cv2.VideoWriter('explore_animation.avi', video_writer_fourcc2, 600, (600, 250))
 
 # Creating a node class to store all node parameters, including the data (node position), list of children, parent of the node, and cost to come for it
 class node:
@@ -62,9 +62,12 @@ class node:
 # Function to check if the robot is in colliding with an obstacle or is in the bloated obstacle space
 def is_robot_coll(robot_r, pos_y, pos_x, map_img):
 	coll_flag = False
+
+	# Checking if the robot is at the edge of map
 	if pos_y > y_max - robot_r or pos_y < y_min + robot_r or pos_x > x_max - robot_r or pos_x < x_min + robot_r:
 		return coll_flag
 
+	# Checking if the robot is touching any pixels in the circular radius of its body
 	for i in range(robot_r):
 		if   np.min(map_img[pos_y+i:pos_y+i+1, pos_x-robot_r+i: pos_x+robot_r-i+1, :]) == 0:
 			# print("pos_y, pos_x: " , pos_y, pos_x)
@@ -77,6 +80,7 @@ def is_robot_coll(robot_r, pos_y, pos_x, map_img):
 	
 	return coll_flag
 
+# Checking if coal reached in a node by finding its distance from goal node
 def is_goal_reached(node):
 	dist = np.sqrt( (node.data[0] - x_g[0])**2 + (node.data[1] - x_g[1])**2 )
 	if dist < 1.5*vec_len:
@@ -91,9 +95,11 @@ def move_up_30(node):
 	y = curr_loc[0]
 	x = curr_loc[1]
 
+	# Checking if the robot is at the edge of map
 	if y > y_max - robot_r or y < y_min + robot_r or x > x_max - robot_r or x < x_min + robot_r:
 		return [], np.inf, np.inf, False
-	
+
+	# Find the coordinates of the next node as per the move, i.e. move 30 degrees counter-clockwise	
 	y_nxt = y + vec_len*np.sin(curr_th+np.pi/6)
 	x_nxt = x + vec_len*np.cos(curr_th+np.pi/6)
 	th_nxt = curr_th + np.pi/6
@@ -111,9 +117,11 @@ def move_up_60(node):
 	y = curr_loc[0]
 	x = curr_loc[1]
 
+	# Checking if the robot is at the edge of map
 	if y > y_max - robot_r or y < y_min + robot_r or x > x_max - robot_r or x < x_min + robot_r:
 		return [], np.inf, np.inf, False
 	
+	# Find the coordinates of the next node as per the move, i.e. move 60 degrees counter-clockwise
 	y_nxt = y + vec_len*np.sin(curr_th+np.pi/3)
 	x_nxt = x + vec_len*np.cos(curr_th+np.pi/3)
 	th_nxt = curr_th + np.pi/3
@@ -131,9 +139,11 @@ def move_down_30(node):
 	y = curr_loc[0]
 	x = curr_loc[1]
 
+	# Checking if the robot is at the edge of map
 	if y > y_max - robot_r or y < y_min + robot_r or x > x_max - robot_r or x < x_min + robot_r:
 		return [], np.inf, np.inf, False
 
+	# Find the coordinates of the next node as per the move, i.e. move 30 degrees clockwise
 	y_nxt = y + vec_len*np.sin(curr_th-np.pi/6)
 	x_nxt = x + vec_len*np.cos(curr_th-np.pi/6)
 	th_nxt = curr_th - np.pi/6	
@@ -151,9 +161,11 @@ def move_down_60(node):
 	y = curr_loc[0]
 	x = curr_loc[1]
 
+	# Checking if the robot is at the edge of map
 	if y > y_max - robot_r or y < y_min + robot_r or x > x_max - robot_r or x < x_min + robot_r:
 		return [], np.inf, np.inf, False
 	
+	# Find the coordinates of the next node as per the move, i.e. move 60 degrees clockwise
 	y_nxt = y + vec_len*np.sin(curr_th-np.pi/3)
 	x_nxt = x + vec_len*np.cos(curr_th-np.pi/3)
 	th_nxt = curr_th - np.pi/3
@@ -272,19 +284,6 @@ node_arr[x_idx, y_idx, 1] = 0
 node_arr[x_idx, y_idx, 0] = start_node
 
 
-# Checking if start node and goal node are in valid locations
-if is_robot_coll(robot_r, x_i[0], x_i[1], map_img=img):
-	print("Start position not valid!")
-	print("Exiting program")
-	exit()
-
-
-if is_robot_coll(robot_r, x_g[0], x_g[1], map_img=img):
-	print("Goal position not valid!")
-	print("Exiting program")
-	exit()
-
-
 # If visualization of start and goal nodes is turned on, visualize the start and goal nodes using circles in image canvas
 if visualize_start_n_goal:
 	start_color = [0, 0, 255] 	# Start node as red color
@@ -300,6 +299,8 @@ open_list.append([0, start_node])
 # Taking copy of image for writing to the exploration video submission
 og_img = img.copy()
 # explore_video.write(og_img)
+
+start = time.time()
 
 # Main loop of the A* algorithm that continues until the current node is pointing to the goal node and until the open list is not empty
 while not is_goal_reached(curr_node) and len(open_list) != 0 and iters < n_iter:
@@ -330,11 +331,10 @@ while not is_goal_reached(curr_node) and len(open_list) != 0 and iters < n_iter:
 				# Do the following if the node is not in open list or the cost-to-come of current node is infinity
 				if new_node_params[3] == False or new_node_params[1] == np.inf:
 					# Modifying the image that is used to record the explored nodes and writing the modified frames to the explored-nodes video
-					og_img[int(y_max - new_coords[0]), int(new_coords[1])] = np.array([255, 255, 0])
-					# img[int(y_max - path_list[i][0]), int(path_list[i][1])] = np.array([0, 0, 0])
+					og_img = cv2.arrowedLine(og_img, [int(curr_node.data[1]), int(y_max - curr_node.data[0])], [int(new_coords[1]),int(y_max - new_coords[0])], [255,255,0], 1, tipLength=0.04)
 					explore_video.write(og_img)
 
-					# Create a new node object at the coordinates returned by the move function and assign it the correct cost-to-come
+					# Create a new node object at the coordinates returned by the move function and assign it the correct cost-to-come and total cost
 					temp_node = node(new_coords)
 					temp_node.ctc = curr_node.ctc + incr_ctc
 					node_arr[y_idx, x_idx, 1] = curr_node.ctc + incr_ctc
@@ -357,7 +357,7 @@ while not is_goal_reached(curr_node) and len(open_list) != 0 and iters < n_iter:
 					# Updating the parent of next-node
 					node_arr[y_idx, x_idx, 0].parent = curr_node
 
-					# Updating the cost-to-come of next-node
+					# Updating the cost-to-come and total cost of next-node
 					node_arr[y_idx, x_idx, 0].ctc = curr_node.ctc + incr_ctc
 					node_arr[y_idx, x_idx, 0].total_cost = curr_node.ctc + incr_ctc + ctg
 					node_arr[y_idx, x_idx, 1] = curr_node.ctc + incr_ctc
@@ -379,8 +379,6 @@ print(path_list)
 for i in range(len(path_list)):
 	img[int(y_max - path_list[i][0]), int(path_list[i][1])] = np.array([0, 0, 0])
 	video.write(img)
-
-# img = cv2.arrowedLine(img, [12,12], [44,44], [255,255,0], 1, tipLength=0.04) 
 
 video.release()
 explore_video.release()

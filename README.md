@@ -1,6 +1,10 @@
 # ENPM661_Project3_phase1
 Github repo for the codes, documentation, and results for ENPM661: Planning for autonomous robots Project 3 Phase 1
 
+## Team Members:
+Mudit Singal  (119262689) (msingal)
+Vidya Shankar (119376706) (shankar3)
+
 ## Github link:
 https://github.com/muditsingal/ENPM661_Project3_phase1
 
