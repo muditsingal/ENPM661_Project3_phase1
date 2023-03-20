@@ -23,8 +23,8 @@ vec_len = 2
 
 # Test Start and goal position
 x_i = np.array([15,16, 0])
-x_g = np.array([35, 582, 0])
-# x_g = np.array([34, 35, 0])
+# x_g = np.array([35, 582, 0])
+x_g = np.array([34, 35, 0])
 # x_g = np.array([157, 56, 0])
 # x_g = np.array([235, 580])
 
@@ -315,8 +315,9 @@ while not is_goal_reached(curr_node) and len(open_list) != 0 and iters < n_iter:
 				# Do the following if the node is not in open list or the cost-to-come of current node is infinity
 				if new_node_params[3] == False or new_node_params[1] == np.inf:
 					# Modifying the image that is used to record the explored nodes and writing the modified frames to the explored-nodes video
-					# og_img[y_max - new_coords[0], new_coords[1]] = np.array([255, 255, 0])
-					# explore_video.write(og_img)
+					og_img[int(y_max - new_coords[0]), int(new_coords[1])] = np.array([255, 255, 0])
+					# img[int(y_max - path_list[i][0]), int(path_list[i][1])] = np.array([0, 0, 0])
+					explore_video.write(og_img)
 
 					# Create a new node object at the coordinates returned by the move function and assign it the correct cost-to-come
 					temp_node = node(new_coords)
@@ -362,7 +363,9 @@ print(path_list)
 # Draw the path as black pixels on the image canvas
 for i in range(len(path_list)):
 	img[int(y_max - path_list[i][0]), int(path_list[i][1])] = np.array([0, 0, 0])
-	# video.write(img)
+	video.write(img)
+
+# img = cv2.arrowedLine(img, [12,12], [44,44], [255,255,0], 1, tipLength=0.04) 
 
 video.release()
 explore_video.release()
@@ -376,5 +379,6 @@ print("Total time taken: ", end - start)
 
 # Display the final image with path
 cv2.imshow('img', img)
+cv2.imshow('Expo img', og_img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
